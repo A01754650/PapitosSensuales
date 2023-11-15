@@ -38,7 +38,7 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
 
     # Find the best possible move in the current position
     # looking up to max_depth ahead
-    def find_best_move(self, posicion, max_depth: int = 3):
+    def find_best_move(self, posicion, max_depth: int = 5):
         best_eval: float = float("-inf")
         best_move = None
 
@@ -47,6 +47,8 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
             if result > best_eval:
                 best_eval = result
                 best_move = move
+
+        # print(f'{best_move = }')
         return best_move
 
 
@@ -54,7 +56,8 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
         # return self.triunfo(posicion) == self.simbolo
-        return self.find_best_move(posicion)
+        return self.triunfo(self.find_best_move(posicion)) == self.simbolo
+
 
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
