@@ -6,23 +6,55 @@ from dagor import JugadorCaballosBailadores, \
 class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
     '''Jugador de Caballos bailadores que tira con una estrategia.'''
 
+    def evaluacion(self, posicion):
+        if posicion[0] == 'B':
+            fila, columna = posicion[5]
+            filaRey, columnaRey = posicion[4]
+        else:
+            fila, columna = posicion[6]
+            filaRey, columnaRey = posicion[3]
+
+        distancia_al_rey = abs(fila - filaRey) + abs(columna - columnaRey)
+        return -distancia_al_rey
+
+    # Find the best possible outcome for original player
+    def minimax(self, posicion, maximizing: bool, max_depth: int) -> float:
+        # Base case – terminal position or maximum depth reached
+        if max_depth == 0:
+            return self.evaluacion(posicion)
+
+        if maximizing:
+            best_eval: float = float("-inf")
+            for move in self.posiciones_siguientes(posicion):
+                result: float = self.minimax(move, False, max_depth - 1)
+                best_eval = max(result, best_eval)
+            return best_eval
+        else:
+            worst_eval: float = float("inf")
+            for move in self.posiciones_siguientes(posicion):
+                result = self.minimax(move, True, max_depth - 1)
+                worst_eval = min(result, worst_eval)
+            return worst_eval
+
+    # Find the best possible move in the current position
+    # looking up to max_depth ahead
+    def find_best_move(self, posicion, max_depth: int = 3):
+        best_eval: float = float("-inf")
+        best_move = None
+
+        for move in self.posiciones_siguientes(posicion):
+            result: float = self.minimax(move, False, max_depth)
+            if result > best_eval:
+                best_eval = result
+                best_move = move
+        return best_move
+
+
     def heuristica(self, posicion):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
         # return self.triunfo(posicion) == self.simbolo
-        # INTENTAR SIEMPRE ESTAR EN EL CENTRO
-        def redondear (numero):
-            if numero % 2 == 0:
-                return round(numero) + 1
-            else:
-                return round(numero)
-
-        if posicion[0] == 'B':
-            return posicion[5][0] in [redondear(posicion[1]/2)] and posicion[5][1] in [redondear(posicion[2]/2)]
-        elif posicion[0] == 'N':
-            return posicion[6][0] in [redondear(posicion[1]/2)] and posicion[6][1] in [redondear(posicion[2]/2)]
-        else:
-            return self.triunfo(posicion) == self.simbolo
+        return self.find_best_move(posicion)
 
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
@@ -59,7 +91,7 @@ if __name__ == '__main__':
 #         rN: Tupla (r, c) con la coordenada del rey negro (fija
 #             durante todo el juego)
 #         cB: Tupla (r, c) con la coordenada del caballo blanco
-#         cN: Tupla (r, c) con la coordenada del caballo blanco
+#         cN: Tupla (r, c) con la coordenada del caballo negro
 
 #     Por ejemplo:
 
