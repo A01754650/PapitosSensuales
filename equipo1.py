@@ -36,14 +36,14 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
                 worst_eval = min(result, worst_eval)
             return worst_eval
 
-    # Find the best possible move in the current position
-    # looking up to max_depth ahead
-    def find_best_move(self, posicion, max_depth: int = 5):
+    # Find the best possible move in the current position looking up to max_depth ahead
+    def find_best_move(self, posicion, max_depth: int = 2):
         best_eval: float = float("-inf")
         best_move = None
 
         for move in self.posiciones_siguientes(posicion):
             result: float = self.minimax(move, False, max_depth)
+            print(f'{result = }')
             if result > best_eval:
                 best_eval = result
                 best_move = move
@@ -55,19 +55,26 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
     def heuristica(self, posicion):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
-        # return self.triunfo(posicion) == self.simbolo
-        return self.triunfo(self.find_best_move(posicion)) == self.simbolo
+        return self.triunfo(posicion) == self.simbolo
+        # return self.triunfo(self.find_best_move(posicion)) == self.simbolo
 
 
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
         tiro válido al azar.'''
+        # print(posicion)
         posibles = self.posiciones_siguientes(posicion)
-        for p in posibles:
-            if self.heuristica(p):
-                return p
-        return choice(posibles)
+        best = self.find_best_move(posicion)
+        if self.heuristica(best):
+            return best
+        else:
+            for p in posibles:
+                print(p)
+                if self.heuristica(p):
+                    return p
+            return choice(posibles)
         # return posibles[0]
+        # POSIBLE ERROR - ACERCARNOS AL REY EN LUGAR DE RANDOM
 
 
 if __name__ == '__main__':
