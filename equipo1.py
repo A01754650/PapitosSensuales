@@ -17,9 +17,8 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         distancia_al_rey = abs(fila - filaRey) + abs(columna - columnaRey)
         return -distancia_al_rey
 
-    # Find the best possible outcome for original player
+
     def minimax(self, posicion, maximizing: bool, max_depth: int) -> float:
-        # Base case – terminal position or maximum depth reached
         if max_depth == 0:
             return self.evaluacion(posicion)
 
@@ -36,19 +35,17 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
                 worst_eval = min(result, worst_eval)
             return worst_eval
 
-    # Find the best possible move in the current position looking up to max_depth ahead
-    def find_best_move(self, posicion, max_depth: int = 2):
+
+    def find_best_move(self, posicion, max_depth: int = 1):
         best_eval: float = float("-inf")
         best_move = None
 
         for move in self.posiciones_siguientes(posicion):
             result: float = self.minimax(move, False, max_depth)
-            print(f'{result = }')
             if result > best_eval:
                 best_eval = result
                 best_move = move
 
-        # print(f'{best_move = }')
         return best_move
 
 
@@ -56,25 +53,39 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
         return self.triunfo(posicion) == self.simbolo
-        # return self.triunfo(self.find_best_move(posicion)) == self.simbolo
+
+
+    def matar_rey(self, posicion):
+        if posicion[0] == 'N':
+            new_position = (posicion[0], posicion[1], posicion[2], posicion[6], posicion[4], posicion[5], posicion[3])
+        elif posicion[0] == 'B':
+            new_position = (posicion[0], posicion[1], posicion[2], posicion[3], posicion[5], posicion[4], posicion[6])
+
+        return new_position
 
 
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
         tiro válido al azar.'''
-        # print(posicion)
+        invertirPos = self.matar_rey(posicion)
+        posibles_matar = self.posiciones_siguientes(invertirPos)
         posibles = self.posiciones_siguientes(posicion)
         best = self.find_best_move(posicion)
         if self.heuristica(best):
             return best
         else:
             for p in posibles:
-                print(p)
-                if self.heuristica(p):
-                    return p
+                for pm in posibles_matar:
+                    if posicion[0] == 'B':
+                        if p[5] == pm[5]:
+                            return p
+                    elif posicion[0] == 'N':
+                        if p[6] == pm[6]:
+                            return p
+
+            if self.heuristica(p):
+                return p
             return choice(posibles)
-        # return posibles[0]
-        # POSIBLE ERROR - ACERCARNOS AL REY EN LUGAR DE RANDOM
 
 
 if __name__ == '__main__':
