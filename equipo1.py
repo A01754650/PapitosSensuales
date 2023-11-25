@@ -1,3 +1,12 @@
+# ----------------------------------------------------------
+# Project: Knight’s Dance
+#
+# Date: 29-Nov-2023
+# Authors:
+#           A01753505 Alan Alcántara Ávila
+#           A01754650 Andrés Iván Rodríguez Méndez
+# ----------------------------------------------------------
+
 from dagor import JugadorCaballosBailadores, \
     choice, JugadorCaballosBailadoresAleatorio, \
     JuegoCaballosBailadores
@@ -17,7 +26,6 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         distancia_al_rey = abs(fila - filaRey) + abs(columna - columnaRey)
         return -distancia_al_rey
 
-
     def minimax(self, posicion, maximizing: bool, max_depth: int) -> float:
         if max_depth == 0:
             return self.evaluacion(posicion)
@@ -35,7 +43,6 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
                 worst_eval = min(result, worst_eval)
             return worst_eval
 
-
     def find_best_move(self, posicion, max_depth: int = 1):
         best_eval: float = float("-inf")
         best_move = None
@@ -48,33 +55,40 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
 
         return best_move
 
-
     def heuristica(self, posicion):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
         return self.triunfo(posicion) == self.simbolo
 
-
     def matar_rey(self, posicion):
         if posicion[0] == 'N':
-            new_position = (posicion[0], posicion[1], posicion[2], posicion[6], posicion[4], posicion[5], posicion[3])
+            new_position = (posicion[0], posicion[1], posicion[2],
+                            posicion[6], posicion[4], posicion[5], posicion[3])
         elif posicion[0] == 'B':
-            new_position = (posicion[0], posicion[1], posicion[2], posicion[3], posicion[5], posicion[4], posicion[6])
+            new_position = (posicion[0], posicion[1], posicion[2],
+                            posicion[3], posicion[5], posicion[4], posicion[6])
 
         return new_position
-
 
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
         tiro válido al azar.'''
         invertirPos = self.matar_rey(posicion)
+        enemigoPos = (posicion[0], posicion[1], posicion[2],
+                      posicion[3], posicion[4], posicion[6], posicion[5])
         posibles_matar = self.posiciones_siguientes(invertirPos)
+        posible_enemigo = self.posiciones_siguientes(enemigoPos)
         posibles = self.posiciones_siguientes(posicion)
         best = self.find_best_move(posicion)
+
         if self.heuristica(best):
             return best
         else:
             for p in posibles:
+                # next = self.find_best_move(p)
+                # if self.heuristica(next):
+                #     return next
+
                 for pm in posibles_matar:
                     if posicion[0] == 'B':
                         if p[5] == pm[5]:
@@ -82,9 +96,17 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
                     elif posicion[0] == 'N':
                         if p[6] == pm[6]:
                             return p
+                for pe in posible_enemigo:
+                    if posicion[0] == 'B':
+                        if p[5] == pe[5]:
+                            continue
+                    elif posicion[0] == 'N':
+                        if p[6] == pe[6]:
+                            continue
 
             if self.heuristica(p):
                 return p
+            print("choice")
             return choice(posibles)
 
 
@@ -92,7 +114,7 @@ if __name__ == '__main__':
     juego = JuegoCaballosBailadores(
         JugadorCaballosBailadoresEquipo1('Smart Boy'),
         JugadorCaballosBailadoresAleatorio('Random Boy'),
-        5, 8)
+        8, 6)
     juego.inicia(veces=100, delta_max=2)
 
 
