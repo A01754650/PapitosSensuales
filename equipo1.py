@@ -7,10 +7,6 @@
 #           A01754650 Andrés Iván Rodríguez Méndez
 # ----------------------------------------------------------
 
-from dagor import JugadorCaballosBailadores, \
-    choice, JugadorCaballosBailadoresAleatorio, \
-    JuegoCaballosBailadores
-
 
 class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
     '''Jugador de Caballos bailadores que tira con una estrategia.'''
@@ -25,7 +21,6 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
 
         distancia_al_rey = abs(fila - filaRey) + abs(columna - columnaRey)
         return -distancia_al_rey
-
 
     def minimax(self, posicion, maximizing: bool, max_depth: int) -> float:
         if max_depth == 0:
@@ -44,7 +39,6 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
                 worst_eval = min(result, worst_eval)
             return worst_eval
 
-
     def find_best_move(self, posicion, max_depth: int = 1):
         best_eval: float = float("-inf")
         best_move = None
@@ -57,12 +51,10 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
 
         return best_move
 
-
     def heuristica(self, posicion):
         '''Devuelve True si posicion resulta en un tiro ganador para este
         Jugador. De otra forma regresa False.'''
         return self.triunfo(posicion) == self.simbolo
-
 
     def matar_rey(self, posicion):
         if posicion[0] == 'N':
@@ -74,8 +66,8 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
 
         return new_position
 
-
-    def checar_casillas(self, posicion, posibles_matar, posible_enemigo, posibles):
+    def checar_casillas(self, posicion, posibles_matar,
+                        posible_enemigo, posibles):
         lst = []
         lst_rey = []
         movimientos = []
@@ -127,7 +119,6 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         random_choice = choice(movimientos)
         return random_choice
 
-
     def tira(self, posicion):
         '''Busca el mejor tiro posible, sino selecciona cualquier
         tiro válido al azar.'''
@@ -142,14 +133,7 @@ class JugadorCaballosBailadoresEquipo1(JugadorCaballosBailadores):
         if self.heuristica(best):
             return best
         else:
-            checar_casillas = self.checar_casillas(posicion, posibles_matar, posible_enemigo, posibles)
-            if checar_casillas != None:
+            checar_casillas = self.checar_casillas(
+                posicion, posibles_matar, posible_enemigo, posibles)
+            if checar_casillas is not None:
                 return checar_casillas
-
-
-if __name__ == '__main__':
-    juego = JuegoCaballosBailadores(
-        JugadorCaballosBailadoresEquipo1('Smart Boy'),
-        JugadorCaballosBailadoresAleatorio('Random Boy'),
-        10, 10)
-    juego.inicia(veces=1000, delta_max=2)
